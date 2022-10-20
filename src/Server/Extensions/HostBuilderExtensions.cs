@@ -13,7 +13,22 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
-            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                #if DEBUG
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .WriteTo.Debug()
+                .WriteTo.Console()
+                #endif
+                #if RELEASE
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
+                {
+                    AutoRegisterTemplate = true,
+                    IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
+                })
+                #endif
+                .CreateLogger();
             SerilogHostBuilderExtensions.UseSerilog(builder);
             return builder;
         }

@@ -2,10 +2,7 @@
 {
     public static class DocumentTypesEndpoints
     {
-        public static string ExportFiltered(string searchString)
-        {
-            return $"{Export}?searchString={searchString}";
-        }
+        public static string ExportFiltered(string searchString) => $"{Export}?searchString={searchString}";
 
         public static string Export = "api/documentTypes/export";
 

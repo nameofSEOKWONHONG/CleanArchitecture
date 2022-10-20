@@ -57,6 +57,11 @@
             {
                 Code = "ar",
                 DisplayName = "عربي"
+            },
+            new LanguageCode
+            {
+                Code = "ko-KR",
+                DisplayName = "한국어"
             }
         };
     }

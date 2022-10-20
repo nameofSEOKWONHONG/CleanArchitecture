@@ -209,13 +209,27 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
             return services;
         }
 
+        /// <summary>
+        /// dotnet ef migrations add mig01 --project ..\Infrastructure\ --context BlazorHeroContext
+        /// dotnet ef database update
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         internal static IServiceCollection AddDatabase(
             this IServiceCollection services,
             IConfiguration configuration)
             => services
                 .AddDbContext<BlazorHeroContext>(options => options
-                    .UseSqlServer(configuration.GetConnectionString("DefaultConnection")))
-            .AddTransient<IDatabaseSeeder, DatabaseSeeder>();
+                    .UseSqlServer(configuration.GetConnectionString("DefaultConnection"), option => {
+                        option.MigrationsAssembly("BlazorHero.CleanArchitecture.Infrastructure");
+                        
+                    })
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging()
+                )
+                .AddTransient<IDatabaseSeeder, DatabaseSeeder>();
+                
 
         internal static IServiceCollection AddCurrentUserService(this IServiceCollection services)
         {
